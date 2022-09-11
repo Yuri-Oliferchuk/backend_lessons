@@ -1,12 +1,12 @@
 import express from 'express'
 
-const app = express()
+export const app = express()
 const port = 3000
 
 const jsonBodyMiddelware = express.json();
 app.use(jsonBodyMiddelware);
 
-const HTTP_STATUSES = {
+export const HTTP_STATUSES = {
   OK200: 200,
   CREATED_201: 201,
   NO_CONTENT_204: 204,
@@ -36,7 +36,7 @@ app.get('/courses/:id', (req, res) => {
   const foundCourses = db.courses.find(e => e.id === Number(req.params.id))
 
   if(!foundCourses) {
-    res.status(HTTP_STATUSES.BAD_REQUEST_400).json({message: 'Not found'})
+    res.status(HTTP_STATUSES.NOT_FOUND_404).json({message: 'Not found'})
     return
   }
   res.json(foundCourses)
@@ -59,7 +59,7 @@ app.post('/courses', (req, res) => {
 app.delete('/courses/:id', (req, res) => {
   db.courses = db.courses.filter(e => e.id !== Number(req.params.id))
 
-  res.status(HTTP_STATUSES.CREATED_201).json({message: 'Deleted'})
+  res.status(HTTP_STATUSES.NO_CONTENT_204).json({message: 'Deleted'})
 })
 
 app.put('/courses/:id', (req, res) => {
@@ -71,12 +71,17 @@ app.put('/courses/:id', (req, res) => {
   const foundCourses = db.courses.find(e => e.id === Number(req.params.id))
 
   if(!foundCourses) {
-    res.status(HTTP_STATUSES.NO_CONTENT_204).json({message: 'Not found'})
+    res.status(HTTP_STATUSES.NOT_FOUND_404).json({message: 'Not found'})
     return
   }
 
   foundCourses.title = req.body.title;
   
+  res.send(HTTP_STATUSES.CREATED_201).json(foundCourses)
+})
+
+app.delete('/__test__/data', (req, res) => {
+  db.courses = [],
   res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 
